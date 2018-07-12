@@ -1,0 +1,12 @@
+CACHE MANIFEST
+
+CACHE
+./fonts/roboto
+./images/ava.jpg
+./images/bg.jpg
+./libs/jquery.min.js
+./libs/materialize.min.css
+./libs/materialize.min.js
+
+NETWORK
+*

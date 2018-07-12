@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html manifest="cache.manifest">
+    <head>
+        <link rel="manifest" href="/manifest.json">
+        <script src="libs/jquery.min.js">
+        </script>
+        <script src="libs/materialize.min.js">
+        </script>
+        <script src="sidenav.js">
+        </script>
+        <link href="libs/materialize.min.css" rel="stylesheet">
+            <meta content="width=device-width, user-scalable=no" name="viewport"/>
+            <meta charset="utf-8"/>
+            <title>
+                Время до звонка
+            </title>
+        </link>
+    </head>
+</html>
+<body align="center">
+    <div id="sidenav">
+    </div>
+    <div class="valign-wrapper">
+        <div class="row">
+            <div class="col">
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">
+                            Время до звонка
+                        </span>
+                        <font id="mode" size="5px">
+                        </font>
+                        <p id="info">
+                        </p>
+                        <font id="time" size="30px">
+                        </font>
+                        <span class="card-title">
+                            Ваш класс
+                            <select id="selectClass" onchange="updateClass(this.value);">
+                                <option disabled="" selected="" value="">
+                                    Выберите класс
+                                </option>
+                            </select>
+                        </span>
+                        <div id="lessons">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="data/rasp.js">
+</script>
+<script>
+    var optionsAsString = "";
+    var classes = Object.keys(rasp);
+    for(var i = 0; i < classes.length; i++) {
+        optionsAsString += "<option value='" + classes[i] + "'>" + classes[i] + "</option>";
+    }
+    $('#selectClass').html(optionsAsString);
+
+    $(document).ready(function() {
+        $('#selectClass').material_select();
+    });
+
+    function updateClass(cl){
+        localStorage.setItem('class',cl);
+        currentClass = cl;
+        updateInfo();
+    }
+
+    Number.prototype.pad = function(size) {
+        var s = String(this);
+        while (s.length < (size || 2)) {s = "0" + s;}
+        return s;
+    }
+
+    // Что это? Код нашего админа. Что с ним? Просто он учился в ВКИ а не на ФИТ'е
+    // Ну или плохо обфусцировал код
+    // Тем не менее я его украл и адаптировал
+    function getMyTime() {
+        // var offsetHoursTest = +24;
+        // var offsetMinTest = 0;
+        var tm = new Date();
+        tm.setHours(tm.getHours()); // this is to test
+        tm.setMinutes(tm.getMinutes());
+        return (tm);
+    }
+
+    function getWeekDay(myTime) {
+        return myTime.getDay();
+    }
+
+    function getNextPeriod(myTime) {
+        var periods = classTimesMinutes;
+        var classTime = 45;
+        if (getWeekDay(myTime) == 3) {
+            periods = classTimesMinutesWed;
+            classTime = 40;
+        }
+        var todayMinutes = myTime.getMinutes() + myTime.getHours() * 60;
+        if (todayMinutes < periods[0]) return ({
+            per: 0,
+            isbrk: true,
+            untilNextPeriod: periods[0] - todayMinutes,
+            untilBreak: -1
+        });
+        for (i = 0; i < periods.length - 1; i++)
+            if (todayMinutes >= periods[i] && todayMinutes < periods[i + 1]) return {
+                per: i + 1,
+                isbrk: (todayMinutes >= periods[i] + classTime),
+                untilNextPeriod: periods[i + 1] - todayMinutes,
+                untilBreak: periods[i] - todayMinutes + classTime
+            };
+        return {
+            per: -1,
+            isbrk: (todayMinutes > periods[periods.length - 1]),
+            untilNextPeriod: -1,
+            untilBreak: -1
+        };
+    }
+    function genTextByLesson(el){
+        // console.log(el)
+        var str = '';
+        var tc = el.teacher.split(' ');
+        var teacher = '('+tc[0].charAt(0) + '. ' + tc[1].charAt(0) + '. ' + tc[2]+')';
+        if (el.room == 'Кабинет не указан')
+            return ' <font size="5px">' + el.subject + "</font> "+teacher + "<br>";
+        else
+            return ' <font size="5px">' + el.subject + "</font> " +teacher + ' каб. '+ el.room + "<br>";
+    }
+
+    var classTimesMinutes = [8 * 60 + 30, 9 * 60 + 30, 10 * 60 + 35, 11 * 60 + 40, 12 * 60 + 40, 13 * 60 + 40, 14 * 60 + 45, 15 * 60 + 35, 16 * 60 + 25, 17 * 60 + 15, 18 * 60 + 05, 18 * 60 + 55, 19 * 60 + 45];
+    var classTimesMinutesWed = [9 * 60 + 5, 10 * 60 + 0, 11 * 60 + 0, 12 * 60 + 0, 12 * 60 + 55, 13 * 60 + 50, 14 * 60 + 40, 15 * 60 + 30];
+    // Коленчатые локализации
+    var number2name1 = 'первого второго третьего четвертого пятого шестого седьмого восьмого'.split(' ');
+    var number2name2 = 'первый второй третий четвертый пятый шестой седьмой восьмой'.split(' ');
+    if (localStorage.getItem('class') != null)
+        var currentClass = localStorage.getItem('class');
+    else
+        var currentClass = '10-м'; // 10м тащит!
+    $('#selectClass').val(currentClass);
+    function updateInfo(){
+        // ЧТО ТУТ ПРОИСХОДИТ
+        var mtime = getMyTime();
+        var info = getNextPeriod(mtime);
+        var text = [ "До звонка с "+number2name1[info.per-1]+" урока осталось:","До звонка на "+number2name2[info.per]+" урок осталось:"][+info.isbrk];
+        var time = [info.untilBreak.pad(2)-1 + ':' + (59 - mtime.getSeconds()).pad(2),info.untilNextPeriod.pad(2)-1+ ':' + (59 - mtime.getSeconds()).pad(2)][+info.isbrk];
+        var mode = ['УРОК','ПЕРЕМЕНА'][+info.isbrk];
+        var lessonText = '<b>Текущий урок</b><br>';
+        if ((info.per != -1)&&(rasp[currentClass][getWeekDay(mtime)-1][info.per + +info.isbrk])&&(rasp[currentClass][getWeekDay(mtime)-1][info.per + +info.isbrk].length != 0)){
+            lessonText += rasp[currentClass][getWeekDay(mtime)-1][info.per + +info.isbrk].map(genTextByLesson).join('');
+            // console.log(lessonText)
+
+            if ((info.per != -1)&&(rasp[currentClass][getWeekDay(mtime)-1][info.per + +info.isbrk + 1])&&(rasp[currentClass][getWeekDay(mtime)-1][info.per + +info.isbrk + 1].length != 0)){
+                lessonText += '<b>Следующий урок</b><br>';
+                lessonText += rasp[currentClass][getWeekDay(mtime)-1][info.per + +info.isbrk + 1].map(genTextByLesson).join('');
+            }
+        }
+        else
+            lessonText = '';
+        
+        
+        if ((info.per == -1) || ((info.untilNextPeriod == -1) || (info.untilBreak == -1)) || (info.per > 8)){
+            text = 'Уроков нет';
+            mode = 'СВОБОДА';
+            time = '';
+        }
+        $('#info').text(text);
+        $('#time').text(time);
+        $('#mode').text(mode);
+        // if 
+        $('#lessons').html(lessonText);
+
+        // console.log('a')
+    }
+    updateInfo();
+    setInterval(updateInfo,1000);
+</script>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html manifest="cache.manifest">
+    <head>
+        <link rel="manifest" href="/manifest.json">
+        <script src="libs/jquery.min.js"></script>
+        <script src="libs/materialize.min.js"></script>
+        <script src="sidenav.js"></script>
+        <link rel="stylesheet" href="libs/materialize.min.css">
+        <meta name="viewport" content="width=device-width, user-scalable=no" />
+        <meta charset="utf-8" />
+        <title>Паниер</title>
+    </head>
+    <body>
+        <div id='sidenav'></div>
+        <div class='valign-wrapper'>
+            <div class='row'>
+                <div class='col'>
+                    <div class="card blue-grey darken-1">
+                        <div class="card-content white-text">
+                            <span class="card-title">Паниер</span>
+                            <!-- <div class="col"> -->
+                                <div class="input-field">
+                                    <textarea id="text1" oninput='russian2pani()' class="materialize-textarea"></textarea>
+                                    <label for="text1">Русский язык</label>
+                                </div>
+                                <label for='pani'>Панийское наречие</label>
+                                
+                                <div class="card-panel teal" id='pani'>
+                                    <span class="white-text" id='text2'>Начните набирать текст</span>
+                                </div>
+                            <!-- </div> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+        var defaultText = 'Начните набирать текст';
+        String.prototype.toProperCase = function() {
+        return this.charAt(0).toUpperCase() + this.substr(1).toLowerCase() + '.';
+        };
+        // var dict = [['получается','а',5],['смотрите','а',5],]
+        function russian2pani() {
+        var russian = $('#text1').val().replace(/\n/g, " ").toLowerCase();
+        console.log(russian);
+        if (russian.length == 0){
+        $('#text2').text(defaultText);
+        return;
+        }
+        var out = '';
+        for (var i = 0; i < russian.length; i++) {
+        var letter = russian.charAt(i);
+        if ((!((letter === ' ') || ((letter >= 'а') && (letter <= 'я'))))) {
+        $('#text1').val('');
+        $('#text2').text(defaultText);
+        return;
+        } else {
+        if (letter == ' ') {
+        console.log(letter);
+        out += 'так ';
+        continue;
+        }
+        var code = letter.charCodeAt(0) - 1072;
+        var newcode = code % 7;
+        switch (Math.floor(code / 7)) {
+        case 0:
+        {
+        out += 'поти' + 'и'.repeat(newcode) + 'ше';
+        break;
+        }
+        case 1:
+        {
+        out += 'пи' + 'и'.repeat(newcode) + 'шете-себе';
+        break;
+        }
+        case 2:
+        {
+        out += 'получа' + 'а'.repeat(newcode) + 'естся';
+        break;
+        }
+        case 3:
+        {
+        out += 'смотри' + 'и'.repeat(newcode) + 'те';
+        break;
+        }
+        case 4:
+        {
+        out += 'поня' + 'я'.repeat(newcode) + 'тно';
+        break;
+        }
+        case 5:
+        {
+        out += 'логично' + 'о'.repeat(newcode) + 'о';
+        break;
+        }
+        }
+        }
+        out += ' ';
+        }
+        out = out.slice(0,out.length-1);
+        $('#text2').text(out.toProperCase());
+        }
+        function pani2russian() {
+        }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html manifest="cache.manifest">
+
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <script src="libs/jquery.min.js"></script>
+    <script src="libs/materialize.min.js"></script>
+    <script src="sidenav.js"></script>
+    <link rel="stylesheet" href="libs/materialize.min.css">
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+
+    <meta charset="utf-8" />
+    <title>Обжехер</title>
+</head>
+
+<body align='center'>
+<div id='sidenav'></div>
+    <div class='valign-wrapper'>
+        <div class="row">
+            <div class="col">
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">ОБЕЖЕХЕР</span>
+                        <p id='text'></p>
+                    </div>
+                </div>
+                <p class="waves-effect waves-light btn" onclick="newCouse();">ОПАСНОСТЬ</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        String.prototype.toProperCase = function() {
+                return this.charAt(0).toUpperCase() + this.substr(1).toLowerCase() + '.';
+        };
+
+        function randEl(items) {
+            return items[Math.floor(Math.random() * items.length)];
+        }
+
+        function newCouse() {
+            var when = ['сегодня', 'вчера', 'позавчера', 'недавно', 'день назад'];
+            var where = ['на улице', 'около школы', 'около дома', 'в городе'];
+            var who = ['меня', 'друга', 'брата'];
+            var how = ['чуть', 'едва'];
+            var what = ['не задавила машина', 'не сбила машина', 'не перехал автомобиль', 'не сбил мотоциклист', 'не убила фура', 'не сбил мусоровоз','не укусила собака'];
+            var seq1 = [when, where, who, how, what];
+
+            var where = ['на улице', 'около школы', 'около дома', 'в городе'];
+            var who = ['я', 'мой друг', 'мой знакомый'];
+            var what = ['не попал под машину', 'не упал в люк', 'не перешел дорогу в неположенном месте','не обжегся супом','не упал с лестницы','не подскользнулся'];
+            var seq2 = [when, where, who, how, what];
+
+            var str = randEl([seq1,seq2]).map(randEl).join(" ").toProperCase();
+
+            document.getElementById('text').innerHTML = str;
+            console.log(str);
+        }
+        newCouse();
+    </script>
+</body>
+
+</html>

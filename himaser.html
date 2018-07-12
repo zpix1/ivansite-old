@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html manifest="cache.manifest">
+    <head>
+        <link rel="manifest" href="/manifest.json">
+        <script src="libs/jquery.min.js"></script>
+        <script src="libs/materialize.min.js"></script>
+        <script src="sidenav.js"></script>
+        
+        <link rel="stylesheet" href="libs/materialize.min.css">
+        <meta name="viewport" content="width=device-width, user-scalable=no" />
+        <meta charset="utf-8" />
+        <title>Химасер</title>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+        </script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config( { TeX: {extensions:["mhchem.js"]} });
+        </script>
+    </head>
+    <body>
+        <div id='sidenav'></div>
+        <div class='valign-wrapper'>
+            <div class="row center">
+                <div class="col">
+                    <div class="card blue-grey darken-1">
+                        <div class="card-content white-text">
+                            <span class="card-title">ХИМАСЕР</span>
+                            <p id='text'></p>
+                        </div>
+                    </div>
+                    <p class="waves-effect waves-light btn" onclick="newFormula();">ХИМИЯ</p>
+                </div>
+            </div>
+        </div>
+        <script>
+        function randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        function shuffle(a) {
+        var j, x, i;
+        for (i = a.length; i; i--) {
+        j = Math.floor(Math.random() * i);
+        x = a[i - 1];
+        a[i - 1] = a[j];
+        a[j] = x;
+        }
+        }
+        elements = ["H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar",
+        "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn"
+        ]; //,"Ga","Ge","As","Se","Br","Kr","Rb","Sr","Y","Zr","Nb","Mo","Tc","Ru","Rh","Pd","Ag","Cd","In","Sn","Sb","Te","I","Xe","Cs","Ba","La","Ce","Pr","Nd","Pm","Sm","Eu","Gd","Tb","Dy","Ho","Er","Tm","Yb","Lu","Hf","Ta","W","Re","Os","Ir","Pt","Au","Hg","Tl","Pb","Bi","Po","At","Rn","Fr","Ra","Ac","Th","Pa","U","Np","Pu","Am","Cm","Bk","Cf","Es","Fm","Md","No","Lr","Rf","Db","Sg","Bh","Hs","Mt","Ds","Rg","Cn","Nh","Fl","Mc","Lv","Ts","Og"];
+        function setText(str) {
+        document.getElementById("text").innerHTML = "$$\\ce{" + str + "}$$";
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, "text"]);
+        }
+        function generateElement(length, kmax, imax, gas) {
+        var out = "";
+        var k = randInt(1, kmax);
+        k == 1 ? 1 == 1 : out += k.toString();
+        shuffle(elements);
+        for (var i = 0; i < length; i++) {
+        var r = randInt(1, imax);
+        if ((out.match(/und/g) || []).length != 0) console.log(i);
+        if (r == 1) {
+        out += elements[i];
+        } else {
+        out += elements[i] + r.toString();
+        }
+        }
+        if (gas) {
+        out += '^ ';
+        }
+        return out;
+        }
+        function newFormula() {
+        var comporator = ['=', '->', '<=>'][randInt(0, 2)];
+        var leftElementsCount = randInt(1, 4);
+        var rightElementsCount = randInt(1, 4);
+        var output = "";
+        for (var i = 0; i < leftElementsCount; i++) {
+        output += generateElement(randInt(1, 3), 6, 6, false);
+        if (i != leftElementsCount - 1)
+        output += ' + ';
+        }
+        output += comporator;
+        for (var i = 0; i < rightElementsCount; i++) {
+        output += generateElement(randInt(1, 3), 6, 6, randInt(0, 1) == 1);
+        if (i != rightElementsCount - 1)
+        output += ' + ';
+        }
+        console.log(output);
+        setText(output);
+        }
+        newFormula();
+        </script>
+    </body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html manifest="cache.manifest">
+
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <script src="libs/jquery.min.js"></script>
+    <script src="libs/materialize.min.js"></script>
+    <script src="sidenav.js"></script>
+    <link rel="stylesheet" href="libs/materialize.min.css">
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+
+    <meta charset="utf-8" />
+    <title>СОБАЧЕР</title>
+</head>
+
+<body align='center'>
+<div id='sidenav'></div>
+    <div class='valign-wrapper'>
+        <div class="row">
+            <div class="col">
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">СОБАЧЕР</span>
+                        <p id='text'></p>
+                    </div>
+                </div>
+                <p class="waves-effect waves-light btn" onclick="newJoke();">Получить шутку про собаку</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        function shuffle(a) {
+            var j, x, i;
+            for (i = a.length - 1; i > 0; i--) {
+                j = Math.floor(Math.random() * (i + 1));
+                x = a[i];
+                a[i] = a[j];
+                a[j] = x;
+            }
+        }
+
+        function capitalize(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        function randint(a,b){return a+Math.floor(Math.random()*(++b-a))}
+        var audio = new Audio('data/gavgav.mp3');
+        var i = 0;
+        var max = randint(30,50);
+        function newJoke(){
+            var words = "казах собака дегроид ёжетркё".split(" ");
+            shuffle(words);
+            var jokes = [
+                capitalize(words[0]) + ", " + words[1] + " - " + words[2] + " и " + words[3],
+                capitalize(words[0]) + ", ты " + words[1] + " и тупой " + words[2] + ", " + words[3],
+                "Ты " + words[0] + ", " + words[1] + ", " + words[2] + " и " + words[3],
+            ]
+            shuffle(jokes);
+            var hrefs = [
+                "https://www.youtube.com/watch?v=J033TIqTl5U",
+                "https://www.youtube.com/watch?v=ppZZvrtW6I8",
+                "https://www.youtube.com/watch?v=-l7eD-IvYDo",
+                "https://www.youtube.com/watch?v=I20Pr912DrY",
+                "https://www.youtube.com/watch?v=7-sA_7xFHzE",
+                "https://www.youtube.com/watch?v=bj-9wDApRjM",
+                "https://i.ytimg.com/vi/uWkYBKN72KU/hqdefault.jpg"
+            ]
+            shuffle(hrefs);
+            $("#text").text(jokes[0]);
+            if (i == max){
+                alert("ХВАТИТ, мышку сломаешь");
+                location.href = hrefs[0];
+            }
+            if (Math.floor(i*2) > max){
+                audio.play();
+            }
+            i++;
+        }
+        newJoke();
+    </script>
+</body>
+
+</html>
