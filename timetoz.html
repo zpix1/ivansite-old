@@ -34,15 +34,20 @@
                         </p>
                         <font id="time" size="30px">
                         </font>
-                        <span class="card-title">
+                        
+                        <div id="lessons">
+                        </div>
+                        <div onclick="$('#settings').toggle()">Настройки</div>
+                        <div id="settings" hidden>
                             Ваш класс
                             <select id="selectClass" onchange="updateClass(this.value);">
                                 <option disabled="" selected="" value="">
                                     Выберите класс
                                 </option>
                             </select>
-                        </span>
-                        <div id="lessons">
+
+                            Сдвиг (в секундах)
+                            <input type="number" onchange="updateOffset(this.value);" id="offsetInput"/>
                         </div>
                     </div>
                 </div>
@@ -70,6 +75,12 @@
         updateInfo();
     }
 
+    function updateOffset(cl){
+        localStorage.setItem('offset',cl);
+        offsetTime = cl;
+        updateInfo();
+    }
+
     Number.prototype.pad = function(size) {
         var s = String(this);
         while (s.length < (size || 2)) {s = "0" + s;}
@@ -78,13 +89,14 @@
 
     // Что это? Код нашего админа. Что с ним? Просто он учился в ВКИ а не на ФИТ'е
     // Ну или плохо обфусцировал код
-    // Тем не менее я его украл и адаптировал
+    // Тем не менее я его украл и адаптировал (на самом деле нормальный код просто я злой)
     function getMyTime() {
         // var offsetHoursTest = +24;
         // var offsetMinTest = 0;
         var tm = new Date();
         tm.setHours(tm.getHours()); // this is to test
         tm.setMinutes(tm.getMinutes());
+        tm.setSeconds(tm.getSeconds() + (+offsetTime));
         return (tm);
     }
 
@@ -140,6 +152,11 @@
         var currentClass = localStorage.getItem('class');
     else
         var currentClass = '10-м'; // 10м тащит!
+    if (localStorage.getItem('offset') != null)
+        var offsetTime = localStorage.getItem('offset');
+    else
+        var offsetTime = 0;
+    $('#offsetInput').val(offsetTime);
     $('#selectClass').val(currentClass);
     function updateInfo(){
         // ЧТО ТУТ ПРОИСХОДИТ
@@ -149,7 +166,7 @@
         var time = [info.untilBreak.pad(2)-1 + ':' + (59 - mtime.getSeconds()).pad(2),info.untilNextPeriod.pad(2)-1+ ':' + (59 - mtime.getSeconds()).pad(2)][+info.isbrk];
         var mode = ['УРОК','ПЕРЕМЕНА'][+info.isbrk];
         var lessonText = '<b>Текущий урок</b><br>';
-        if ((info.per != -1)&&(rasp[currentClass][getWeekDay(mtime)-1][info.per + +info.isbrk])&&(rasp[currentClass][getWeekDay(mtime)-1][info.per + +info.isbrk].length != 0)){
+        if ((rasp[currentClass][getWeekDay(mtime)-1]) && (info.per != -1)&&(rasp[currentClass][getWeekDay(mtime)-1][info.per + +info.isbrk])&&(rasp[currentClass][getWeekDay(mtime)-1][info.per + +info.isbrk].length != 0)){
             lessonText += rasp[currentClass][getWeekDay(mtime)-1][info.per + +info.isbrk].map(genTextByLesson).join('');
             // console.log(lessonText)
 
@@ -162,7 +179,7 @@
             lessonText = '';
         
         
-        if ((info.per == -1) || ((info.untilNextPeriod == -1) || (info.untilBreak == -1)) || (info.per > 8)){
+        if ((info.per == -1) || ((info.untilNextPeriod == -1) || (info.untilBreak == -1)) || (info.per > 8) || (getWeekDay(mtime) === 0)){
             text = 'Уроков нет';
             mode = 'СВОБОДА';
             time = '';
