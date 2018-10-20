@@ -57,6 +57,19 @@
 </body>
 <script src="data/rasp.js">
 </script>
+<script src="libs/upup.js">
+</script>
+<script>
+UpUp.start({
+    'content-url': 'timetoz.html',
+    'assets': [
+        'libs/jquery.min.js', 
+        'materialize.min.css',
+        'materialize.min.js',
+        'data/rasp.js'
+    ]
+});
+</script>
 <script>
     var optionsAsString = "";
     var classes = Object.keys(rasp);
